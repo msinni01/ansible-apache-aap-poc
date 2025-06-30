@@ -1,0 +1,6 @@
+# roles/apache/handlers/main.yml
+---
+- name: Reinicia Apache
+  ansible.builtin.service:
+    name: httpd
+    state: restarted

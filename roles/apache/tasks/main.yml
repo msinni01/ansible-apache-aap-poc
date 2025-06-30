@@ -1,0 +1,34 @@
+---
+- name: Instala o Apache
+  ansible.builtin.yum:
+    name: httpd
+    state: present
+
+- name: Cria página index customizada
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: /var/www/html/index.html
+    mode: '0644'
+    notify: Reinicia Apache
+
+- name: Inicia e habilita o Apache
+  ansible.builtin.service:
+    name: httpd
+    state: started
+    enabled: true
+
+- name: Configura SELinux para permitir HTTP
+  ansible.posix.seboolean:
+    name: httpd_can_network_connect
+    state: true
+    persistent: yes
+
+- name: Libera porta 80 no firewall
+  ansible.posix.firewalld:
+    port: 80/tcp
+    permanent: true
+    state: enabled
+    immediate: yes
+    zone: public
+  when: ansible_facts.os_family == "RedHat"
+
