@@ -9,7 +9,7 @@
     src: index.html.j2
     dest: /var/www/html/index.html
     mode: '0644'
-    notify: Reinicia Apache
+  notify: Reinicia Apache
 
 - name: Inicia e habilita o Apache
   ansible.builtin.service:
