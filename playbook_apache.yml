@@ -1,6 +1,6 @@
 ---
 - name: Provisionar Apache no RHEL
-  hosts: web_servers
+  hosts: 192.168.190.133
   become: true
   vars:
     apache_message: "# -------------------------- #\n# Bem vindo ao teste Ansible #\n# -------------------------- #"
