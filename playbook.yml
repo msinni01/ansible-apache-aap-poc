@@ -1,0 +1,47 @@
+---
+- name: Provisionar Apache no RHEL
+  hosts: web_servers
+  become: true
+  vars:
+    apache_message: "# -------------------------- #\n# Bem vindo ao teste Ansible #\n# -------------------------- #"
+  tasks:
+    - name: Instalar o Apache
+      ansible.builtin.yum:
+        name: httpd
+        state: present
+
+    - name: Iniciar e habilitar Apache
+      ansible.builtin.service:
+        name: httpd
+        state: started
+        enabled: true
+
+    - name: Configurar firewall para liberar HTTP
+      ansible.posix.firewalld:
+        service: http
+        permanent: true
+        state: enabled
+        immediate: true
+
+    - name: Criar página index.html com mensagem customizada
+      ansible.builtin.copy:
+        dest: /var/www/html/index.html
+        content: "{{ apache_message }}"
+        owner: apache
+        group: apache
+        mode: '0644'
+        backup: true
+        force: true
+      notify: Restart Apache
+
+    - name: Garantir SELinux permissivo para Apache acessar /var/www
+      ansible.posix.seboolean:
+        name: httpd_can_network_connect
+        state: true
+        persistent: true
+
+  handlers:
+    - name: Restart Apache
+      ansible.builtin.service:
+        name: httpd
+        state: restarted
